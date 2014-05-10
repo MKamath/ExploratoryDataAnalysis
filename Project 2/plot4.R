@@ -1,11 +1,14 @@
+# Reading SCC Data, and subsetting it to get only Coal Combustion related rows
 SCC <- readRDS("Source_Classification_Code.rds")
 coalSCC <- SCC[grepl("Combustion", SCC$SCC.Level.One, ignore.case=TRUE) | grepl("Coal", SCC$SCC.Level.Three, ignore.case=TRUE), ]
 coalSCC <- coalSCC[, c("SCC")]
 coalSCC <- levels(droplevels(coalSCC))
 
+# Reading NEI Data
 NEI <- readRDS("summarySCC_PM25.rds")
 Data <- NEI[NEI$SCC %in% coalSCC, ]
 
+# Processing the data to find out the total emissions per year 
 totalEmissions <- aggregate(Data$Emissions, list(Year = Data$year, SCC = Data$SCC), sum)
 totalEmissions <- aggregate(totalEmissions$x, list(Year = totalEmissions$Year), sum)
 
